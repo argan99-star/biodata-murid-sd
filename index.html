@@ -1,1 +1,185 @@
-<!doctype html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Biodata Murid SD</title><script src='https://cdn.jsdelivr.net/npm/chart.js'></script></head><body><h2 style='text-align:center'>BIODATA MURID SEKOLAH DASAR</h2><p>Versi siap GitHub Pages dengan login admin, infografis, biodata, update data, dan cetak.</p><p>Username: 20315045 | Password: sdnpulo</p><p>Silakan gunakan file ini sebagai dasar upload GitHub Pages. (Versi ringkas siap dikembangkan)</p></body></html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biodata Murid Sekolah Dasar</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#eef4f5}
+.header{width:94%;margin:18px auto;padding:24px;border-radius:28px;
+background:linear-gradient(135deg,#0ea5a4,#2f9eb1,#c89d42);color:#fff;text-align:center}
+.tabs{width:94%;margin:auto;display:flex;gap:8px;flex-wrap:wrap}
+.tab{padding:12px 18px;border:0;border-radius:14px;background:#dce6e6;cursor:pointer}
+.tab.active{background:#0ea5a4;color:#fff}
+.card{width:94%;margin:16px auto;background:#fff;border-radius:24px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.hidden{display:none}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+input,select,button{padding:10px;border-radius:12px;border:1px solid #ccc}
+button{cursor:pointer}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px;border-bottom:1px solid #eee;font-size:14px}
+thead{background:#d1d5db}
+.thumb{width:50px;height:50px;object-fit:cover;border-radius:10px;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.stat{padding:18px;border-radius:22px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.pagination{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.page{padding:8px 12px;border-radius:10px;border:0}
+.page.active{background:#0ea5a4;color:#fff}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);justify-content:center;align-items:center}
+.modal img{max-width:320px;border-radius:18px;background:#fff;padding:10px}
+footer{text-align:center;padding:16px;background:#245f60;color:#fff;margin-top:20px}
+@media print{.tabs,.controls,.header,footer,.pagination{display:none}.card{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="header"><h1>BIODATA MURID SEKOLAH DASAR</h1></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="infografis" class="card">
+  <div class="controls">
+    <select id="chartMode">
+      <option value="kelas">Total per Kelas</option>
+      <option value="jk">Jenis Kelamin per Kelas</option>
+    </select>
+    <button onclick="renderChart()">Refresh Grafik</button>
+    <input id="adminUser" placeholder="Username Admin">
+    <input id="adminPass" type="password" placeholder="Password">
+    <button onclick="loginAdmin()">Login Admin</button>
+  </div>
+  <canvas id="chartCanvas"></canvas>
+  <div id="cards" class="grid" style="margin-top:18px"></div>
+</div>
+
+<div id="biodata" class="card hidden">
+<h3>Data Biodata Siswa</h3>
+<div class="controls">
+<input id="search" placeholder="Pencarian cepat">
+<select id="kelasFilter"><option value="">Semua Kelas</option></select>
+<select id="jkFilter"><option value="">Semua Jenis Kelamin</option></select>
+<select id="rows"><option>10</option><option>20</option><option>50</option><option>100</option><option value="all">Semua</option></select>
+<button onclick="applyFilter()">Cari</button>
+<button onclick="resetFilter()">Reset</button>
+</div>
+<div style="overflow:auto">
+<table>
+<thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th><th>Pass Photo</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table></div>
+<div class="pagination" id="pages"></div>
+</div>
+
+<div id="update" class="card hidden">
+<iframe src="https://tally.so/r/xXR9ay?transparentBackground=1" style="width:100%;height:80vh;border:0;border-radius:20px"></iframe>
+</div>
+
+<div id="cetak" class="card hidden">
+<h3>Cetak Data Siswa</h3>
+<div class="controls">
+<select id="printKelas"><option value="">Semua Kelas</option></select>
+<button onclick="printAll()">Cetak Semua</button>
+<button onclick="printByClass()">Cetak per Kelas</button>
+</div>
+<div id="printArea"></div>
+</div>
+
+<div class="modal" id="modal" onclick="this.style.display='none'"><img id="modalImg"></div>
+<footer>© 2026 Biodata Murid SDN Pulo • GitHub Pages Ready</footer>
+
+<script>
+const URL='https://docs.google.com/spreadsheets/d/18MjAN6iR4RGbE_G1q3MBvgekGHpylMlcBQh-xOS3E9Y/gviz/tq?tqx=out:json';
+let students=[], filtered=[], page=1, chart, admin=false;
+
+function renderTabs(){
+ tabs.innerHTML='';
+ const names=admin?['Infografis','Biodata','Update','Cetak']:['Infografis'];
+ names.forEach((n,i)=>{
+  const b=document.createElement('button');
+  b.className='tab'+(i===0?' active':'');
+  b.textContent=n;
+  b.onclick=()=>show(n.toLowerCase());
+  tabs.appendChild(b);
+ });
+}
+function show(id){
+ ['infografis','biodata','update','cetak'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+ [...document.querySelectorAll('.tab')].find(t=>t.textContent.toLowerCase()==id)?.classList.add('active');
+}
+function loginAdmin(){
+ if(adminUser.value==='20315045' && adminPass.value==='sdnpulo'){
+   admin=true; renderTabs(); alert('Login admin berhasil');
+ } else alert('Username atau password salah');
+}
+async function load(){
+ const txt=await (await fetch(URL)).text();
+ const json=JSON.parse(txt.substring(47).slice(0,-2));
+ students=json.table.rows.map(r=>{
+ const c=r.c||[];
+ return {nama:c[0]?.v||'',tempat:c[1]?.v||'',tgl:c[2]?.f||c[2]?.v||'',nik:c[3]?.v||'',nisn:c[4]?.v||'',nis:c[5]?.v||'',jk:c[6]?.v||'',kelas:c[7]?.v||'',foto:c[8]?.v||''}
+ });
+ filtered=[...students];
+ const kelas=[...new Set(students.map(x=>x.kelas))].sort();
+ kelas.forEach(k=>{
+   kelasFilter.innerHTML+=`<option>${k}</option>`;
+   printKelas.innerHTML+=`<option>${k}</option>`;
+ });
+ [...new Set(students.map(x=>x.jk))].forEach(j=>jkFilter.innerHTML+=`<option>${j}</option>`);
+ renderTable(); renderChart();
+}
+function applyFilter(){
+ filtered=students.filter(x=>x.nama.toLowerCase().includes(search.value.toLowerCase()) && (!kelasFilter.value||x.kelas==kelasFilter.value) && (!jkFilter.value||x.jk==jkFilter.value));
+ page=1; renderTable();
+}
+function resetFilter(){search.value='';kelasFilter.value='';jkFilter.value='';filtered=[...students];renderTable()}
+function renderTable(){
+ tbody.innerHTML='';
+ let per=rows.value==='all'?filtered.length:+rows.value;
+ let show=filtered.slice((page-1)*per,(page-1)*per+per);
+ show.forEach(s=>{
+ tbody.innerHTML+=`<tr><td>${s.nama}</td><td>${s.tempat}</td><td>${s.tgl}</td><td>${s.nik}</td><td>${s.nisn}</td><td>${s.nis}</td><td>${s.jk}</td><td>${s.kelas}</td><td>${s.foto?`<img src="${s.foto}" class="thumb" onclick="event.stopPropagation();viewPhoto('${s.foto}')">`:''}</td></tr>`;
+ });
+ pages.innerHTML='';
+ const total=Math.ceil(filtered.length/per);
+ for(let i=1;i<=total;i++) pages.innerHTML+=`<button class="page ${i===page?'active':''}" onclick="page=${i};renderTable()">${i}</button>`;
+}
+function viewPhoto(src){modalImg.src=src;modal.style.display='flex'}
+function renderChart(){
+ const map={};
+ students.forEach(s=>{
+  if(!map[s.kelas]) map[s.kelas]={L:0,P:0,T:0};
+  (s.jk||'').toLowerCase().includes('l')?map[s.kelas].L++:map[s.kelas].P++;
+  map[s.kelas].T++;
+ });
+ const labels=Object.keys(map).sort();
+ cards.innerHTML=labels.map((k,i)=>`<div class="stat" style="background:linear-gradient(135deg,hsl(${i*50},75%,55%),#1f2937)">
+ <div style="font-size:14px;opacity:.95;margin-bottom:8px">Kelas ${k}</div>
+ <div style="font-size:34px;font-weight:bold">${map[k].T}</div>
+ <div style="margin-top:10px;font-size:15px">👦 Laki-laki : <b>${map[k].L}</b></div>
+ <div style="font-size:15px">👧 Perempuan : <b>${map[k].P}</b></div>
+ <div style="margin-top:8px;font-size:13px;opacity:.9">Detail jumlah siswa per kelas</div>
+ </div>`).join('');
+ const datasets=chartMode.value==='jk'
+ ?[{label:'Laki-laki',data:labels.map(k=>map[k].L),backgroundColor:'#3b82f6'},
+   {label:'Perempuan',data:labels.map(k=>map[k].P),backgroundColor:'#ec4899'}]
+ :[{label:'Jumlah Siswa',data:labels.map(k=>map[k].T),backgroundColor:labels.map((_,i)=>`hsl(${i*50},75%,55%)`)}];
+ if(chart) chart.destroy();
+ chart=new Chart(document.getElementById('chartCanvas'),{
+  type:'bar',
+  data:{labels,datasets},
+  options:{responsive:true,animation:{duration:1800,easing:'easeOutBounce'},
+   plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}
+ });
+}
+chartMode.onchange=renderChart;
+rows.onchange=()=>{page=1;renderTable()}
+function buildPrint(data){
+ printArea.innerHTML='<h3>Data Murid</h3><table><thead><tr><th>Nama</th><th>Kelas</th><th>JK</th></tr></thead><tbody>'+data.map(s=>`<tr><td>${s.nama}</td><td>${s.kelas}</td><td>${s.jk}</td></tr>`).join('')+'</tbody></table>';
+}
+function printAll(){buildPrint(students);window.print()}
+function printByClass(){buildPrint(students.filter(s=>!printKelas.value||s.kelas==printKelas.value));window.print()}
+renderTabs(); load();
+</script>
+</body>
+</html>
