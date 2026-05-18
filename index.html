@@ -139,7 +139,7 @@ function filterPrint(){
 }
 function printData(){
  const arr=printFiltered.length?printFiltered:data;
- printArea.innerHTML='<p>Tanggal Cetak: '+new Date().toLocaleDateString('id-ID')+'</p><table><thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th></tr></thead><tbody>'+
+ printArea.innerHTML='<div style="text-align:center;border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:12px"><div style="font-size:22px;font-weight:bold">PEMERINTAH KABUPATEN</div><div style="font-size:24px;font-weight:bold">SEKOLAH DASAR NEGERI PULO</div><div style="font-size:14px">Alamat Sekolah • Telepon Sekolah • Email Sekolah</div></div><div style="display:flex;justify-content:space-between;margin:8px 0 14px"><div><b>REKAP BIODATA MURID</b></div><div>Tanggal Cetak: '+new Date().toLocaleDateString('id-ID')+'</div></div><table><thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th></tr></thead><tbody>'+
  arr.map(x=>`<tr><td>${x.nama}</td><td>${x.tempat}</td><td>${x.tgl}</td><td>${x.nik}</td><td>${x.nisn}</td><td>${x.nis}</td><td>${x.jk}</td><td>${x.kelas}</td></tr>`).join('')+'</tbody></table>';
  window.print();
 }
