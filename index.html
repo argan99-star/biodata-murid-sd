@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -136,26 +137,72 @@ function filterPrint(){
  printArea.innerHTML='<div style="margin:8px 0;font-weight:bold">Data ditemukan: '+printFiltered.length+' siswa</div><table><thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th></tr></thead><tbody>'+
  printFiltered.map(x=>`<tr><td>${x.nama}</td><td>${x.tempat}</td><td>${x.tgl}</td><td>${x.nik}</td><td>${x.nisn}</td><td>${x.nis}</td><td>${x.jk}</td><td>${x.kelas}</td></tr>`).join('')+'</tbody></table>';
 }
+
 function printData(){
  const arr=printFiltered.length?printFiltered:data;
- printArea.innerHTML='<div style="text-align:center;border-bottom:3px solid #000;padding-bottom:10px;margin-bottom:12px"><div style="font-size:22px;font-weight:bold"><div style="display:flex;align-items:center;gap:16px;border-bottom:4px double #000;padding-bottom:10px;margin-bottom:14px">
-<img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Logo_Kabupaten_Blora.png" style="width:95px;height:95px;object-fit:contain">
-<div style="flex:1;text-align:center;line-height:1.35">
-<div style="font-size:22px;font-weight:bold">PEMERINTAH KABUPATEN BLORA</div>
-<div style="font-size:20px;font-weight:bold">DINAS PENDIDIKAN</div>
-<div style="font-size:18px;font-weight:bold">KORWIL BIDIK KECAMATAN KEDUNGTUBAN</div>
-<div style="font-size:34px;font-weight:900;letter-spacing:1px">SDN PULO</div>
-<div style="font-size:13px">Alamat : Jl. Pertamina KM. 0,5 Desa Pulo, Kec. Kedungtuban, Kab. Blora 58381</div>
-<div style="font-size:13px">email : sdn.pulo@gmail.com</div>
-</div>
-</div>
-<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 14px">
-<div style="font-size:22px;font-weight:bold">REKAP BIODATA MURID</div>
-<div>Tanggal Cetak: '+new Date().toLocaleDateString('id-ID')+'</div>
-</div><table><thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th></tr></thead><tbody>'+
- arr.map(x=>`<tr><td>${x.nama}</td><td>${x.tempat}</td><td>${x.tgl}</td><td>${x.nik}</td><td>${x.nisn}</td><td>${x.nis}</td><td>${x.jk}</td><td>${x.kelas}</td></tr>`).join('')+'</tbody></table>';
- printArea.innerHTML += '<div style="display:flex;justify-content:space-between;margin-top:45px"><div style="text-align:center"><div>Mengetahui,</div><div><b>Kepala Sekolah</b></div><div style="height:80px"></div><div style="text-decoration:underline;font-weight:bold">(.............................)</div><div>NIP. .............................</div></div><div style="text-align:center"><div>Blora, '+new Date().toLocaleDateString('id-ID')+'</div><div><b>Operator Sekolah</b></div><div style="height:80px"></div><div style="text-decoration:underline;font-weight:bold">(.............................)</div><div>NIP. .............................</div></div></div>'; window.print();
+ const tanggal = new Date().toLocaleDateString('id-ID');
+
+ printArea.innerHTML = `
+ <div style="display:flex;align-items:center;gap:16px;border-bottom:4px double #000;padding-bottom:10px;margin-bottom:14px">
+ <img src="logo-blora.png" style="width:90px;height:90px;object-fit:contain">
+   <div style="flex:1;text-align:center;line-height:1.35">
+      <div style="font-size:22px;font-weight:bold">PEMERINTAH KABUPATEN BLORA</div>
+      <div style="font-size:20px;font-weight:bold">DINAS PENDIDIKAN</div>
+      <div style="font-size:18px;font-weight:bold">KORWIL BIDIK KECAMATAN KEDUNGTUBAN</div>
+      <div style="font-size:34px;font-weight:900">SDN PULO</div>
+      <div style="font-size:13px">Alamat : Jl. Pertamina KM. 0,5 Desa Pulo, Kec. Kedungtuban, Kab. Blora 58381</div>
+      <div style="font-size:13px">Email : sdn.pulo@gmail.com</div>
+   </div>
+ </div>
+
+ <div style="display:flex;justify-content:space-between;margin:12px 0">
+   <div style="font-size:18px;font-weight:bold">REKAP BIODATA MURID</div>
+   <div>Tanggal Cetak: ${tanggal}</div>
+ </div>
+
+ <table style="width:100%;border-collapse:collapse" border="1" cellspacing="0" cellpadding="6">
+ <thead>
+ <tr>
+ <th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th>
+ <th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th>
+ </tr>
+ </thead>
+ <tbody>
+ ${arr.map(x=>`
+ <tr>
+ <td>${x.nama}</td>
+ <td>${x.tempat}</td>
+ <td>${x.tgl}</td>
+ <td>${x.nik}</td>
+ <td>${x.nisn}</td>
+ <td>${x.nis}</td>
+ <td>${x.jk}</td>
+ <td>${x.kelas}</td>
+ </tr>`).join('')}
+ </tbody>
+ </table>
+
+ <div style="display:flex;justify-content:space-between;margin-top:50px">
+   <div style="text-align:center">
+      <div>Mengetahui,</div>
+      <div><b>Kepala Sekolah</b></div>
+      <div style="height:80px"></div>
+      <div style="text-decoration:underline;font-weight:bold">(.............................)</div>
+      <div>NIP. .............................</div>
+   </div>
+
+   <div style="text-align:center">
+      <div>Blora, ${tanggal}</div>
+      <div><b>Operator Sekolah</b></div>
+      <div style="height:80px"></div>
+      <div style="text-decoration:underline;font-weight:bold">(.............................)</div>
+      <div>NIP. .............................</div>
+   </div>
+ </div>
+ `;
+ window.print();
 }
+
 renderTabs(); load();
 </script>
 </body>
