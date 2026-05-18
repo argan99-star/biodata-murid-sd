@@ -35,9 +35,11 @@ thead{background:#d1d5db}
 <option value="kelas">Total per Kelas</option>
 <option value="jk">Jenis Kelamin per Kelas</option>
 </select>
+<div id="loginWrap" style="display:none;gap:8px;flex-wrap:wrap">
 <input id="u" placeholder="Username Admin">
 <input id="p" type="password" placeholder="Password">
-<button onclick="login()">Login Admin</button>
+</div>
+<button id="loginBtn" onclick="toggleLogin()">🔐 Login Admin</button>
 </div>
 <canvas id="chart" height="110"></canvas>
 <div id="cards" class="grid" style="margin-top:18px"></div>
@@ -58,15 +60,15 @@ thead{background:#d1d5db}
 <h3>Cetak Data</h3>
 <div class="controls">
 <select id="kelasCetak"><option value="">Semua Kelas</option></select>
-<button onclick="printData(false)">Cetak Semua</button>
-<button onclick="printData(true)">Cetak per Kelas</button>
+<button onclick="filterPrint()">🔎 Cari</button>
+<button onclick="printData()">🖨️ Cetak</button>
 </div>
 <div id="printArea"></div>
 </div>
 
 <script>
 const URL='https://docs.google.com/spreadsheets/d/18MjAN6iR4RGbE_G1q3MBvgekGHpylMlcBQh-xOS3E9Y/gviz/tq?tqx=out:json';
-let data=[],chart,admin=false;
+let data=[],chart,admin=false,printFiltered=[];
 
 function renderTabs(){
  tabs.innerHTML='';
@@ -81,10 +83,18 @@ function show(id){
  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
  [...document.querySelectorAll('.tab')].find(x=>x.textContent.toLowerCase()==id)?.classList.add('active');
 }
+function toggleLogin(){
+ const w=document.getElementById('loginWrap');
+ if(w.style.display==='none'||!w.style.display){w.style.display='flex';document.getElementById('u').focus();return;}
+ login();
+}
 function login(){
  if(u.value==='20315045'&&p.value==='sdnpulo'){admin=true;renderTabs();alert('Login berhasil')}
  else alert('Username/password salah');
 }
+document.addEventListener('keydown',e=>{
+ if(e.key==='Enter' && document.getElementById('loginWrap').style.display==='flex'){ login(); }
+});
 async function load(){
  const t=await (await fetch(URL)).text();
  const j=JSON.parse(t.substring(47).slice(0,-2));
@@ -122,11 +132,16 @@ function renderChart(){
  }});
 }
 mode.onchange=renderChart;
-function printData(perkelas){
- const arr=perkelas&&kelasCetak.value?data.filter(x=>x.kelas==kelasCetak.value):data;
- printArea.innerHTML='<h2>BIODATA MURID SEKOLAH DASAR</h2><p>Tanggal Cetak: '+new Date().toLocaleDateString('id-ID')+'</p><table><thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th></tr></thead><tbody>'+
- arr.map(x=>`<tr><td>${x.nama}</td><td>${x.tempat}</td><td>${x.tgl}</td><td>${x.nik}</td><td>${x.nisn}</td><td>${x.nis}</td><td>${x.jk}</td><td>${x.kelas}</td></tr>`).join('')
- +'</tbody></table>'; window.print();
+function filterPrint(){
+ printFiltered=kelasCetak.value?data.filter(x=>x.kelas==kelasCetak.value):[...data];
+ printArea.innerHTML='<div style="margin:8px 0;font-weight:bold">Data ditemukan: '+printFiltered.length+' siswa</div><table><thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th></tr></thead><tbody>'+
+ printFiltered.map(x=>`<tr><td>${x.nama}</td><td>${x.tempat}</td><td>${x.tgl}</td><td>${x.nik}</td><td>${x.nisn}</td><td>${x.nis}</td><td>${x.jk}</td><td>${x.kelas}</td></tr>`).join('')+'</tbody></table>';
+}
+function printData(){
+ const arr=printFiltered.length?printFiltered:data;
+ printArea.innerHTML='<p>Tanggal Cetak: '+new Date().toLocaleDateString('id-ID')+'</p><table><thead><tr><th>Nama Lengkap</th><th>Tempat Lahir</th><th>Tanggal Lahir</th><th>NIK</th><th>NISN</th><th>NIS</th><th>Jenis Kelamin</th><th>Kelas</th></tr></thead><tbody>'+
+ arr.map(x=>`<tr><td>${x.nama}</td><td>${x.tempat}</td><td>${x.tgl}</td><td>${x.nik}</td><td>${x.nisn}</td><td>${x.nis}</td><td>${x.jk}</td><td>${x.kelas}</td></tr>`).join('')+'</tbody></table>';
+ window.print();
 }
 renderTabs(); load();
 </script>
