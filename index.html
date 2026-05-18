@@ -22,7 +22,7 @@ input,select,button{padding:10px;border-radius:12px;border:1px solid #ccc}
 table{width:100%;border-collapse:collapse}
 th,td{padding:8px;border-bottom:1px solid #ddd;font-size:13px}
 thead{background:#d1d5db}
-@media print {.header,.tabs,.controls,#infografis{display:none}.card{box-shadow:none}}
+@media print {.header,.tabs,.controls,#infografis,no-print{display:!important;}.card{box-shadow:none}}
 </style>
 </head>
 <body>
@@ -146,17 +146,17 @@ function printData(){
  <div style="display:flex;align-items:center;gap:16px;border-bottom:4px double #000;padding-bottom:10px;margin-bottom:14px">
  <img src="logo-blora.png" style="width:110px;height:110px;object-fit:contain">
    <div style="flex:1;text-align:center;line-height:1.35">
-      <div style="font-size:22px;font-weight:bold">PEMERINTAH KABUPATEN BLORA</div>
-      <div style="font-size:20px;font-weight:bold">DINAS PENDIDIKAN</div>
-      <div style="font-size:18px;font-weight:bold">KORWIL BIDIK KECAMATAN KEDUNGTUBAN</div>
-      <div style="font-size:34px;font-weight:900">SDN PULO</div>
+      <div style="font-size:16px;font-weight:bold">PEMERINTAH KABUPATEN BLORA</div>
+      <div style="font-size:16px;font-weight:bold">DINAS PENDIDIKAN</div>
+      <div style="font-size:16px;font-weight:bold">KORWIL BIDIK KECAMATAN KEDUNGTUBAN</div>
+      <div style="font-size:26px;font-weight:900">SDN PULO</div>
       <div style="font-size:13px">Alamat : Jl. Pertamina KM. 0,5 Desa Pulo, Kec. Kedungtuban, Kab. Blora 58381</div>
       <div style="font-size:13px">Email : sdn.pulo@gmail.com</div>
    </div>
  </div>
 
  <div style="display:flex;justify-content:space-between;margin:12px 0">
-   <div style="font-size:18px;font-weight:bold">REKAP BIODATA MURID</div>
+   <div style="font-size:14px;font-weight:bold">REKAP BIODATA MURID</div>
    <div>Tanggal Cetak: ${tanggal}</div>
  </div>
 
